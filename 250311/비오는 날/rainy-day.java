@@ -1,7 +1,4 @@
 import java.util.Scanner;
-import java.util.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 class Forecast {
     String date, day, weather;
@@ -15,42 +12,25 @@ class Forecast {
 }
 
 public class Main {
+    public static Forecast ans = new Forecast("9999-99-99", "", "");
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
-        int m = 0;
 
-        Forecast[] forecasts = new Forecast[n];
         for (int i = 0; i < n; i++) {
             String date = sc.next();
             String day = sc.next();
             String weather = sc.next();
 
+            Forecast f = new Forecast(date, day,weather);
             if (weather.equals("Rain")){
-                forecasts[m] = new Forecast(date, day, weather);
-                m++;
-            }
-        }
-        
-        int idx = 0;
-        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");
-
-        for (int j = 0; j < m; j++) {
-            try {
-                Date d1,d2;
-                d1 = dateFormat.parse(forecasts[idx].date);
-                d2 = dateFormat.parse(forecasts[j].date);
-
-                if (d1.compareTo(d2) > 0) {
-                    idx = j;
-                }
-
-            } catch (ParseException e) {
-                e.printStackTrace();
+                if (ans.date.compareTo(f.date)>0)
+                    ans = f;
             }
         }
 
-        System.out.printf("%s %s %s", forecasts[idx].date, forecasts[idx].day, forecasts[idx].weather);
+        System.out.printf("%s %s %s", ans.date, ans.day, ans.weather);
 
     }
 }
