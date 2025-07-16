@@ -29,13 +29,13 @@ def check(inputValue):
     s = Stack()
 
     for p in inputValue:
-        try:
-            if p =="(":
-                s.push(p)
-            else:
-                s.pop()
-        except:
-            return "No"
+        if p =="(":
+            s.push(p)
+        else:
+            if not s.isExist():
+                return "No"
+            s.pop()
+
     
     if s.isExist():
         return "No"
