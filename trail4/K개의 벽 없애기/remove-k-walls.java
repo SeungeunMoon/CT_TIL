@@ -2,124 +2,84 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-
-    static int N,K,sr,sc,er,ec;
-    static int minDis = Integer.MAX_VALUE;
-    static int[][] graph,curGraph;
-    static int[] picked;
-    static boolean[][] visited;
-    static int[] dr = {-1,1,0,0}, dc = {0,0,-1,1};
-    static List<Point> walls;
-
-    static class Point {
-        int r,c, cnt;
-
-        public Point(int r, int c, int cnt) {
-            this.r = r;
-            this.c = c;
-            this.cnt = cnt;
+    private static int n,k;
+    private static int[][] map;
+    private static Pair start,end;
+    private static int[] dx={1,-1,0,0};
+    private static int[] dy={0,0,1,-1};
+    static class Pair{
+        int x,y,dis,wall;
+        public Pair(int x,int y){
+            this.x=x;
+            this.y=y;
+        }
+        public Pair(int x,int y,int dis,int wall){
+            this.x=x;
+            this.y=y;
+            this.dis=dis;
+            this.wall=wall;
         }
     }
+    public static void main(String[] args) throws IOException {
 
-    public static void main(String[] args)throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-
-        N = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
-
-        graph = new int[N][N];
-        walls = new ArrayList<>();
+        BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st=new StringTokenizer(br.readLine());
 
 
-        for(int i=0; i<N; i++) {
-            st = new StringTokenizer(br.readLine());
-            for(int j=0; j<N;j++) {
-                graph[i][j] = Integer.parseInt(st.nextToken());
-                if(graph[i][j] == 1) {
-                    walls.add(new Point(i,j,0));
-                }
+        n = Integer.parseInt(st.nextToken());
+        k=Integer.parseInt(st.nextToken());
+
+       
+        map = new int[n][n];
+
+        for (int i = 0; i < n; i++) {
+            st=new StringTokenizer(br.readLine());
+            for (int j = 0; j < n; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
+        st=new StringTokenizer(br.readLine());
 
-        st = new StringTokenizer(br.readLine());
-        sr = Integer.parseInt(st.nextToken())-1;
-        sc = Integer.parseInt(st.nextToken())-1;
+       int r1 = Integer.parseInt(st.nextToken());
+        int c1 = Integer.parseInt(st.nextToken());
+        st=new StringTokenizer(br.readLine());
+        int r2 = Integer.parseInt(st.nextToken());
+        int c2 = Integer.parseInt(st.nextToken());
 
-        st = new StringTokenizer(br.readLine());
-        er = Integer.parseInt(st.nextToken())-1;
-        ec = Integer.parseInt(st.nextToken())-1;
+        start=new Pair(r1-1,c1-1);
+        end=new Pair(r2-1,c2-1);
+
+        System.out.println(bfs());
         
-        picked = new int[K];
-        combi(0, 0);
-        if(minDis != Integer.MAX_VALUE) System.out.print(minDis);
-        else System.out.print(-1);
-
     }
+    private static int bfs(){
+        Queue<Pair> q=new LinkedList<>();
+        boolean[][][] visited=new boolean[n][n][k+1];
+        q.add(new Pair(start.x,start.y,0,0));
+        visited[start.x][start.y][0]=true;
 
-    public static void combi(int cur, int depth ) {
-
-        if(depth == K) {
-            visited = new boolean[N][N];
-            curGraph = new int [N][N];
-
-            for(int i=0; i<N;i++) {
-                for(int j=0; j<N; j++) {
-                    curGraph[i][j] = graph[i][j];
-                }
+        while(!q.isEmpty()){
+            Pair curr= q.poll();
+            if(curr.x==end.x && curr.y==end.y){
+                return curr.dis;
             }
-
-            for(int i=0; i<picked.length; i++) {
-
-                curGraph[walls.get(picked[i]).r][walls.get(picked[i]).c] = 0;
-
-            }
-            
-            int result = BFS();
-            if(result != 0) {
-                minDis = Integer.min(minDis, result);
-            }
-
-            return;
-        }
-
-        for(int i = cur; i < walls.size(); i++) {
-
-            picked[depth] = i;
-            combi(i+1, depth + 1);
-        }
-
-    }
-
-    public static int BFS() {
-
-        Queue<Point> q = new ArrayDeque();
-        visited[sr][sc] = true;
-        q.add(new Point(sr,sc,0));
-        int cnt = 0;
-
-        while(!q.isEmpty()) {
-            Point cur = q.poll();
-            cnt++;
-
-            if(cur.r == er && cur.c == ec) return cur.cnt;
-
-            for(int i=0; i<4; i++) {
-                int nr = cur.r + dr[i];
-                int nc = cur.c + dc[i];
-
-                if(nr>=0 && nc>=0 && nr<N && nc<N) {
-                    if(!visited[nr][nc] && curGraph[nr][nc] == 0) {
-                        visited[nr][nc]=true;
-                        q.add(new Point(nr,nc,cur.cnt+1));
+            for(int i=0;i<4;i++){
+                int nx=curr.x+dx[i];
+                int ny= curr.y+dy[i];
+                if(nx>=0 && nx<n &&ny>=0 &&ny<n &&!visited[nx][ny][curr.wall]){
+                    if(map[nx][ny]==1){
+                        if(curr.wall<k){
+                            q.add(new Pair(nx,ny,curr.dis+1,curr.wall+1));
+                            visited[nx][ny][curr.wall+1]=true;
+                        }
+                    }else{
+                        q.add(new Pair(nx,ny,curr.dis+1,curr.wall));
+                            visited[nx][ny][curr.wall]=true;
                     }
                 }
             }
         }
-
-        return 0;
+        return -1;
 
     }
-
-
 }
