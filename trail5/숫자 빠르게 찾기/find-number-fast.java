@@ -2,44 +2,48 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-
-    static int n,m;
-    static int[] ns;
-
-
+    private static int n,m;
+    private static int[] arr;
     public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st=new StringTokenizer(br.readLine());
+        n=Integer.parseInt(st.nextToken());
+        m=Integer.parseInt(st.nextToken());
 
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-        ns = new int[n];
-
-        st = new StringTokenizer(br.readLine());
-        for(int i=0; i< n;i++) {
-            ns[i] = Integer.parseInt(st.nextToken());
-        }
-
-        for(int i=0; i< m;i++) {
-            int num =  Integer.parseInt(br.readLine());
-            
-            System.out.println(binary_search(num));
+        arr = new int[n];
+        st=new StringTokenizer(br.readLine());
+        for (int i = 0; i < n; i++){
+            arr[i] = Integer.parseInt(st.nextToken());
 
         }
+        StringBuilder sb=new StringBuilder();
+
+
+        for (int i = 0; i < m; i++) {
+            int x = Integer.parseInt(br.readLine());
+            int num = solve(x);
+
+            if(num>=0){
+                sb.append(num+1);
+            }else{
+                sb.append(-1);
+            }
+            sb.append('\n');
+        }
+        System.out.println(sb);
     }
-    public static int binary_search(int num) {
-        int left = 0;
-        int right = ns.length;
+    private static int solve(int target){
+        int left=0;
+        int right=n-1;
+        while(left<=right){
+            int mid=(left+right)/2;
+            if(arr[mid]==target) return mid;
 
-        while(left < right) {
-            int mid = (left + right) / 2; 
+            if(arr[mid]>target) right=mid-1;
+            else left =mid+1;
 
-            if(ns[mid] == num) return mid+1;
-
-            if(ns[mid] < num) left = mid+1;
-            else right = mid;
         }
-
         return -1;
+        
     }
 }
