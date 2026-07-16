@@ -1,63 +1,56 @@
 import java.util.*;
 import java.io.*;
-
 public class Main {
-
-    static int n,m;
-    static int[] ns;
-
-
+    private static int n,m;
+    private static int[] arr;
     public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st=new StringTokenizer(br.readLine());
+        n=Integer.parseInt(st.nextToken());
+        m=Integer.parseInt(st.nextToken());
 
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-        ns = new int[n];
 
-        st = new StringTokenizer(br.readLine());
-        for(int i=0; i< n;i++) {
-            ns[i] = Integer.parseInt(st.nextToken());
+        arr=new int[n];
+        st=new StringTokenizer(br.readLine());
+        for(int i=0;i<n;i++){
+            arr[i]=Integer.parseInt(st.nextToken());
         }
 
-        for(int i=0; i<m; i++) {
-            int num = Integer.parseInt(br.readLine());
-            System.out.println(upper_bound(num)-lower_bound(num));
+        for(int i=0;i<m;i++){
+            int num=Integer.parseInt(br.readLine());
+            int result=upper(num)-lower(num);
+            System.out.println(result);
         }
 
     }
-
-    public static int lower_bound(int target) {
-
-        int left = 0;
-        int right = ns.length;
-
-        while(left < right) {
-            int mid = (left+ right) / 2;
-
-            if(ns[mid] >= target) {
-                right = mid;
-            } else {
-                left = mid+1;
+    private static int lower(int target){
+        int left=0;
+        int right=n-1;
+        int minIndex=n;
+        while(left<=right){
+            int mid=(left+right)/2;
+            if(arr[mid]>=target){
+                right=mid-1;
+                minIndex=Math.min(minIndex,mid);
+            }else{
+                left=mid+1;
             }
         }
-        return left;
+        return minIndex;
     }
-
-    public static int upper_bound(int target) {
-
-        int left = 0;
-        int right = ns.length;
-
-        while(left < right) {
-            int mid = (left+ right) / 2;
-
-            if(ns[mid] > target) {
-                right = mid;
-            } else {
-                left = mid+1;
+    private static int upper(int target){
+        int left=0;
+        int right=n-1;
+        int minIndex=n;
+        while(left<=right){
+            int mid=(left+right)/2;
+            if(arr[mid]>target){
+                right=mid-1;
+                minIndex=Math.min(minIndex,mid);
+            }else{
+                left=mid+1;
             }
         }
-        return left;
+        return minIndex;
     }
 }
