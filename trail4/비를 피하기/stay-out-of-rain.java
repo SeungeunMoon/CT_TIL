@@ -1,77 +1,90 @@
 import java.util.*;
 import java.io.*;
-
-// 0 : 이동
-// 1 : 이동 x(벽)
-// 2 : 사람
-// 3 : 비 피할 수 이음
 public class Main {
-    private static int[][] map;
     private static int n,h,m;
-    private static int[] dx={1,-1,0,0};
-    private static int[] dy={0,0,-1,1};
+    private static int[][] a;
+    private static int[][] result;
+    private static List<Edge> rain =new ArrayList<>();
+
+    static class Edge{
+        int x,y;
+        public Edge(int x,int y){
+            this.x=x;
+            this.y=y;
+        }
+    }
     public static void main(String[] args) throws IOException{
-        // Please write your code here.
-        BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
+        
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st=new StringTokenizer(br.readLine());
-
-        n=Integer.parseInt(st.nextToken());
-        h=Integer.parseInt(st.nextToken());
-        m=Integer.parseInt(st.nextToken());
-        map=new int[n][n];
-
-        for(int i=0;i<n;i++){
+        n = Integer.parseInt(st.nextToken());
+        h = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+ 
+        a = new int[n][n];
+        for (int i = 0; i < n; i++){
             st=new StringTokenizer(br.readLine());
-            for(int j=0;j<n;j++){
-                map[i][j]=Integer.parseInt(st.nextToken());
+            for (int j = 0; j < n; j++){
+                a[i][j] = Integer.parseInt(st.nextToken());
+                if(a[i][j]==3){
+                    rain.add(new Edge(i,j));
+                }
             }
         }
-        int[][] result=bfs();
-        StringBuilder sb=new StringBuilder();
-        
+        bfs();
+
+        StringBuilder sb= new StringBuilder();
         for(int i=0;i<n;i++){
             for(int j=0;j<n;j++){
-                if(map[i][j]==2){
-                sb.append(result[i][j]);
-                }else sb.append(0);
-
-                sb.append(' ');
+                if(a[i][j]==2){
+                    sb.append(result[i][j]).append(' ');
+                }else{
+                    sb.append(0).append(' ');
+                }
             }
             sb.append('\n');
         }
-        System.out.println(sb);
-        
+
+        System.out.print(sb);
     }
-    private static int[][] bfs(){
-        int[][] dist=new int[n][n];
+    private static void bfs(){
+        int[] dx={1,-1,0,0};
+        int[] dy={0,0,-1,1};
+
+        //초기화
+        result=new int[n][n];
         for(int i=0;i<n;i++){
-            Arrays.fill(dist[i],-1);
+            Arrays.fill(result[i],-1);
         }
+
         Queue<int[]> q=new LinkedList<>();
 
-        for(int i=0;i<n;i++){
-            for(int j=0;j<n;j++){
-                if(map[i][j]==3){
-                    q.add(new int[]{i,j});
-                    dist[i][j]=0;
-                }
-            }
+        for(int i=0;i<rain.size();i++){
+            q.add(new int[]{rain.get(i).x,rain.get(i).y,0});
+            result[rain.get(i).x][rain.get(i).y]=0;
         }
+
         while(!q.isEmpty()){
             int[] curr=q.poll();
-            int x=curr[0];
-            int y=curr[1];
+
             for(int i=0;i<4;i++){
-                int nx=x+dx[i];
-                int ny=y+dy[i];
-                if(nx>=0 && nx<n &&ny>=0 && ny<n){
-                    if(map[nx][ny]!=1 && dist[nx][ny]==-1){
-                        dist[nx][ny]=dist[x][y]+1;
-                        q.add(new int[]{nx,ny});
-                    }
+                int nx=curr[0]+dx[i];
+                int ny=curr[1]+dy[i];
+
+                if(nx<0||nx>=n||ny<0||ny>=n) continue;
+
+                if(a[nx][ny]==1) continue;
+
+                if(result[nx][ny]==-1 || result[nx][ny]> curr[2]+1){
+                    q.add(new int[]{nx,ny,curr[2]+1});
+                    result[nx][ny]=curr[2]+1;
                 }
             }
+
         }
-        return dist;
+
     }
 }
+
+// 이건 반대로 비를 피할 수 있는 공간에서 사람 까지 공간 슛
+// 0 : 이동가능 1: 불가능 2: 사람 서있음 3 비 하기 가능
