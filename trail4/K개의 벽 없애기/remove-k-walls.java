@@ -2,84 +2,74 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-    private static int n,k;
-    private static int[][] map;
-    private static Pair start,end;
-    private static int[] dx={1,-1,0,0};
-    private static int[] dy={0,0,1,-1};
-    static class Pair{
-        int x,y,dis,wall;
-        public Pair(int x,int y){
-            this.x=x;
-            this.y=y;
-        }
-        public Pair(int x,int y,int dis,int wall){
-            this.x=x;
-            this.y=y;
-            this.dis=dis;
-            this.wall=wall;
-        }
-    }
-    public static void main(String[] args) throws IOException {
-
-        BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
+    private static int n,k,r1,r2,c1,c2;
+    private static int[][] grid;
+    public static void main(String[] args) throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st=new StringTokenizer(br.readLine());
-
-
-        n = Integer.parseInt(st.nextToken());
+        
+        n=Integer.parseInt(st.nextToken());
         k=Integer.parseInt(st.nextToken());
-
-       
-        map = new int[n][n];
+  
+        grid = new int[n][n];
 
         for (int i = 0; i < n; i++) {
             st=new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
+                grid[i][j] = Integer.parseInt(st.nextToken());
             }
         }
         st=new StringTokenizer(br.readLine());
 
-       int r1 = Integer.parseInt(st.nextToken());
-        int c1 = Integer.parseInt(st.nextToken());
-        st=new StringTokenizer(br.readLine());
-        int r2 = Integer.parseInt(st.nextToken());
-        int c2 = Integer.parseInt(st.nextToken());
+        r1=Integer.parseInt(st.nextToken())-1;
+        c1=Integer.parseInt(st.nextToken())-1;
 
-        start=new Pair(r1-1,c1-1);
-        end=new Pair(r2-1,c2-1);
+        st=new StringTokenizer(br.readLine());
+
+        r2=Integer.parseInt(st.nextToken())-1;
+        c2=Integer.parseInt(st.nextToken())-1;
+
 
         System.out.println(bfs());
-        
+
+
     }
     private static int bfs(){
-        Queue<Pair> q=new LinkedList<>();
+        int[] dx=new int[]{1,-1,0,0};
+        int[] dy=new int[]{0,0,1,-1};
+
+        Queue<int[]> q = new LinkedList<>();
         boolean[][][] visited=new boolean[n][n][k+1];
-        q.add(new Pair(start.x,start.y,0,0));
-        visited[start.x][start.y][0]=true;
+
+        q.add(new int[]{r1,c1,0,k});
+        visited[r1][c1][k]=true;
 
         while(!q.isEmpty()){
-            Pair curr= q.poll();
-            if(curr.x==end.x && curr.y==end.y){
-                return curr.dis;
+            int[] curr=q.poll();
+
+            if(curr[0]==r2&&curr[1]==c2){
+                return curr[2];
             }
+
             for(int i=0;i<4;i++){
-                int nx=curr.x+dx[i];
-                int ny= curr.y+dy[i];
-                if(nx>=0 && nx<n &&ny>=0 &&ny<n &&!visited[nx][ny][curr.wall]){
-                    if(map[nx][ny]==1){
-                        if(curr.wall<k){
-                            q.add(new Pair(nx,ny,curr.dis+1,curr.wall+1));
-                            visited[nx][ny][curr.wall+1]=true;
-                        }
-                    }else{
-                        q.add(new Pair(nx,ny,curr.dis+1,curr.wall));
-                            visited[nx][ny][curr.wall]=true;
+                int nx=curr[0]+dx[i];
+                int ny=curr[1]+dy[i];
+
+                if(nx<0||nx>=n||ny<0||ny>=n) continue;
+                if(visited[nx][ny][curr[3]]) continue;
+                if(grid[nx][ny]==1){
+                    if(curr[3]>=1){
+                        q.add(new int[]{nx,ny,curr[2]+1,curr[3]-1});
+                        visited[nx][ny][curr[3]-1]=true;
                     }
+                }else{
+                    q.add(new int[]{nx,ny,curr[2]+1,curr[3]});
+                        visited[nx][ny][curr[3]]=true;
                 }
             }
+           
         }
-        return -1;
 
+        return -1;
     }
 }
