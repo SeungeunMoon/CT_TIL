@@ -1,112 +1,87 @@
 import java.util.*;
 import java.io.*;
-//(3^10=60000) * (20*20)
 
+//각각 위치에 어떤 폭탄을 놓을지 -> 백트래킹
+//폭탄 터트려서 갯수 세기 
+// 최대치 갱신
 public class Main {
-
-    static int n,k, maxTotal = 0;
-    static int[][] grid, testGrid;
-    static int[] combi;
-
-    public static void main(String[] args) throws IOException {
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static int n,ans=0;
+    private static int[][] map;
+    private static List<Edge> list=new ArrayList<>();
+    private static List<Integer> isSelected=new ArrayList<>();
+    private static int[][][] type= {
+        {//1번 타입
+            {-2,-1,0,1,2},{0,0,0,0,0}
+        },{//2번 타입
+            {-1,1,0,0,0},{0,0,0,1,-1}
+        },{//3번 타입
+            {-1,-1,0,1,1},{1,-1,0,1,-1}
+        }
+    };
+    static class Edge{
+        int x,y;
+        public Edge(int x,int y){
+            this.x=x;
+            this.y=y;
+        }
+    }
+    public static void main(String[] args) throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
 
-        n = Integer.parseInt(br.readLine());
-        grid = new int[n][n];
-        testGrid = new int[n][n];
+        n=Integer.parseInt(br.readLine());
 
-       
+
+        map = new int[n][n];
+
         for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
+            st=new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
-                grid[i][j] = Integer.parseInt(st.nextToken());
-                if(grid[i][j] == 1) k++;
-            }
-        }
-
-        combi = new int[k+1];
-        backTracking(1);
-
-        System.out.print(maxTotal);
-
-    }
-
-    static int totalSum() {
-        int total = 0;
-               
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
-                if(testGrid[i][j] == 2){
-                    total++;
+                map[i][j]=Integer.parseInt(st.nextToken());
+                if(map[i][j]==1){
+                    list.add(new Edge(i,j));
                 }
             }
         }
-
-        return total;
+        per(0);
+        System.out.println(ans);
+        // Please write your code here.
     }
+    private static int bomb(){
+        boolean[][] visited=new boolean[n][n];
+        int cnt=0;
+        for(int i=0;i<list.size();i++){
+            Edge curr=list.get(i);
+            int currType=isSelected.get(i);
 
-    // 중복 순열 
-    static void backTracking(int depth) {
+            for(int j=0;j<5;j++){
+                int nx=curr.x+type[currType][0][j];
+                int ny=curr.y+type[currType][1][j];
 
-        if( depth == k+1 ) {
-            for(int i=0; i<n;i++){
-                for(int j=0;j<n;j++){
-                    testGrid[i][j] = grid[i][j];
-                }
+                if(nx<0||nx>=n||ny<0||ny>=n) continue;
+
+                if(visited[nx][ny]) continue;
+
+                cnt++;
+                visited[nx][ny]=true;
             }
+        }
+        return cnt;
+    }
+    private static void per(int size){
+        if(size==list.size()){
+            int cnt=bomb();
 
-            int idx = 1;
-            for(int i =0; i< n; i++) {
-                for(int j=0; j<n; j++) {
-                    if(grid[i][j] == 1){
-                        testGrid[i][j] = 2;
-                        bomb(combi[idx++], i, j);
-                    }
-                }
-            }
-
-            maxTotal = Math.max(totalSum(),maxTotal);
-
+            ans=Math.max(ans,cnt);
             return;
         }
 
-        for (int i = 1; i < 4; i++) {
-            combi[depth] = i;
-            backTracking(depth+1);
-        }
-
-    }
-
-    static boolean inRange(int r,  int c) {
-        return (r >= 0 && c >= 0 && r < n && c < n);
-    }
-
-    static void bomb(int tp, int r, int c) {
-        int[] dr = new int[4];
-        int[] dc = new int[4];
-
-        switch(tp) {
-            case 1:
-                dr = new int[]{-1,-2,1,2}; dc = new int[]{0,0,0,0};
-                break;
-            case 2:
-                dr = new int[]{-1, 0, 1, 0}; dc = new int[]{0, -1, 0, 1};
-                break;
-            case 3:
-                dr = new int[]{-1,-1,1,1}; dc = new int[]{-1,1,-1,1};
-                break;
-            }
-
-        for(int i = 0; i < 4; i++) {
-            int nr = r + dr[i];
-            int nc = c + dc[i];
-
-            if(inRange(nr,nc)) {
-                testGrid[nr][nc] = 2;
-            }
+        for(int i=0;i<3;i++){
+            isSelected.add(i);
+            per(size+1);
+            isSelected.remove(isSelected.size()-1);
         }
 
     }
 }
+
