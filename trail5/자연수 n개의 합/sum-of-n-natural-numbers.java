@@ -1,24 +1,28 @@
-import java.util.Scanner;
+import java.util.*;
+import java.io.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        long s = sc.nextLong();
-        
-        long start = 1;
-        long end = 2000000000L;
-        long minNum = end;
+    public static void main(String[] args) throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        long s=Long.parseLong(br.readLine());
 
-        while(start < end) {
-            long mid = (start+end) / 2;
-            if(mid*(mid+1)/2 > s) {
-                end = mid;
-            } else {
-                start = mid+1;
+        long mid=0;
+        long left=1;
+        long right=2_000_000_000L;
+        long max=0;
+        while(left<=right){
+            mid=(left+right)/2;
+
+            long num=mid*(mid+1)/2; // 1~mid까지 합
+            if(num<=s){
+                left=mid+1;
+                max=Math.max(max,mid);
+            }else{
+                right=mid-1;
             }
         }
-        System.out.print(end-1);
+        System.out.println(max);
+
+        // Please write your code here.
     }
-
-
 }
